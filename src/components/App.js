@@ -6,6 +6,7 @@ import Inventory from './Inventory'
 import Fish from './Fish'
 
 import sampleFishes from '../sample-fishes'
+import base from '../base';
 
 class App extends React.Component {
 
@@ -14,6 +15,31 @@ class App extends React.Component {
     orders: {}
   }
 
+  componentDidMount() {
+    // this runs right before the app is rendered
+    this.ref = base.syncState(`${this.props.match.params.storeId}/fishes`, {
+      context: this,
+      state: 'fishes'
+    })
+
+    // check if there's any order in localstorage
+    const localStorageRef = localStorage.getItem(`order-${this.props.match.params.storeId}`);
+
+    if (localStorageRef) {
+      // update our app component's order state
+      this.setState({
+        orders: JSON.parse(localStorageRef)
+      })
+    }
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    localStorage.setItem(`order-${this.props.match.params.storeId}`, JSON.stringify(nextState.orders))
+  }
 
   addFish = (fish) => {
     // update our state
@@ -22,6 +48,12 @@ class App extends React.Component {
     const timeStamp = Date.now()
     fishes[`fish-${timeStamp}`] = fish
     // set state
+    this.setState({ fishes })
+  }
+
+  updateFish = (key, updatedFish) => {
+    const fishes = { ...this.state.fishes }
+    fishes[key] = updatedFish;
     this.setState({ fishes })
   }
 
@@ -41,7 +73,6 @@ class App extends React.Component {
   }
 
   render() {
-
     return (
       <div className="catch-of-the-day">
         <div className="menu">
@@ -58,8 +89,15 @@ class App extends React.Component {
             }
           </ul>
         </div>
-        <Order fishes={this.state.fishes} order={this.state.orders} />
-        <Inventory addFish={this.addFish} loadSamples={this.loadSamples} />
+        <Order
+          fishes={this.state.fishes}
+          order={this.state.orders}
+          params={this.props.match.params} />
+        <Inventory
+          addFish={this.addFish}
+          updateFish={this.updateFish}
+          loadSamples={this.loadSamples}
+          fishes={this.state.fishes} />
       </div>
     )
   }
