@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import Header from './Header'
 import Order from './Order'
@@ -6,7 +7,7 @@ import Inventory from './Inventory'
 import Fish from './Fish'
 
 import sampleFishes from '../sample-fishes'
-import base from '../base';
+import { base } from '../base';
 
 class App extends React.Component {
 
@@ -116,10 +117,16 @@ class App extends React.Component {
           updateFish={this.updateFish}
           removeFish={this.removeFish}
           loadSamples={this.loadSamples}
-          fishes={this.state.fishes} />
+          fishes={this.state.fishes}
+          storeId={this.props.match.params.storeId}
+        />
       </div>
     )
   }
+}
+
+App.propTypes = {
+  params: PropTypes.object
 }
 
 export default App;

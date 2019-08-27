@@ -16,7 +16,6 @@ class StorePicker extends React.Component {
 
   goToStore = (event) => {
     event.preventDefault();
-    console.log(this.storeInput.current.value)
 
     const storeName = this.storeInput.current.value
 
